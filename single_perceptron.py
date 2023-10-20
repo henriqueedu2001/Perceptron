@@ -4,7 +4,7 @@ class Perceptron:
     def __init__(self, dimension) -> None:
         self.weights = np.zeros(dimension)
         self.bias = 0
-        self.dimension = dimension
+        self.dimension = dimension 
         
     def output(self, x: np.array):
         """Saída do perceptron
@@ -19,6 +19,53 @@ class Perceptron:
         
         return self.logit(w_sum)
     
+    
+    def gradient_descent_fit(self, train_set: np.array, learning_rate: float, epochs: int) -> None:
+        """Treinamento por gradiente descendente
+
+        Args:
+            train_set (np.array): dataset de treino
+            learning_rate (float): taxa de aprendizado
+            epochs (int): quantidade de épocas
+        """
+        # pontos do dataset de treino
+        n_points = len(train_set)
+        
+        for i in range(epochs):
+            loss_grad = self.loss_grad(train_set)
+            
+            # w^(t+1) = w^(t) - eta * grad(L(w^(t)))
+            self.weights = self.weights - learning_rate*loss_grad[1:]
+            self.bias = self.bias - learning_rate*loss_grad[0]
+            
+            print(self.bias, self.weights)
+    
+    
+    def loss_grad(self, train_set: np.array) -> np.array:
+        """Gradiente da Loss
+
+        Args:
+            train_set (np.array): dataset de treino
+
+        Returns:
+            np.array: gradiente da loss grad L = (grad_w_0, grad_w_1, 
+            grad_w_2, grad_w_3, ..., grad_w_n)
+        """
+        # grad L = (grad_w_0, grad_w_1, grad_w_2, ..., grad_w_n)
+        grad = np.zeros(self.dimension)
+        
+        n_points = len(train_set)
+        
+        # para cada ponto, somar parcela do gradiente
+        for point in train_set:
+                x, y = point[:-1], point[-1]
+                y_hat = self.output(x)
+                
+                logit_grad = self.logit_gradient(x)
+                
+                grad = grad + (2/n_points)*(y_hat - y)*logit_grad
+        
+        return grad
     
     def weighted_sum(self, x: np.array):
         """Soma da entrada, ponderada pelos pesos do perceptron
@@ -68,15 +115,36 @@ class Perceptron:
         grad_bias = np.array([logit_derivative])
         
         return np.concatenate([grad_bias, grad_weights])
-        
+
+
+def generate_data(n):
+    for i in range(n):
+        x = 10*(np.random.rand() - 0.5)
+        print(f'[{x}, {Perceptron.logit(Perceptron, x)}], ')
     
 def test():
-    p = Perceptron(2)
-    p.weights = np.array([2, 3])
-    p.bias = 7
+    p = Perceptron(1)
+    p.weights = np.array([2.5])
+    p.bias = -1.3
     
-    x = np.array([3,1])
-    p.weighted_sum(x)
-    print(p.logit_gradient(x))
+    # f(x) = logit(0 + 1x)
+    train_set = np.array([
+        [3.0345, 0.954], 
+        [2.8760, 0.94], 
+        [-2.666, 0.064], 
+        [1.840, 0.862], 
+        [-3.018, 0.0465], 
+        [-3.844, 0.0209], 
+        [-2.26, 0.0940], 
+        [2.986, 0.951], 
+        [2.482, 0.922], 
+        [3.0026, 0.952]
+    ])
     
+    p.gradient_descent_fit(train_set, 0.10, 400)
+    
+    x = np.array([5])
+    print(p.output(x))
+
+# generate_data(10)
 test()
