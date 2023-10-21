@@ -5,6 +5,7 @@ class Perceptron:
         self.weights = np.zeros(dimension + 1)
         self.dimension = dimension 
         
+        
     def output(self, x: np.array):
         """Saída y do perceptron, para um dado x = (x_1, x_2, x_3, ..., x_n)
 
@@ -35,10 +36,9 @@ class Perceptron:
             loss_grad = self.loss_grad(train_set)
             
             # w^(t+1) = w^(t) - eta * grad(L(w^(t)))
-            self.weights = self.weights - learning_rate*loss_grad[1:]
-            self.bias = self.bias - learning_rate*loss_grad[0]
+            self.weights = self.weights - learning_rate*loss_grad
             
-            print(self.bias, self.weights)
+            print(self.weights)
     
     
     def loss_grad(self, train_set: np.array) -> np.array:
@@ -52,20 +52,37 @@ class Perceptron:
             grad_w_2, grad_w_3, ..., grad_w_n)
         """
         # grad L = (grad_w_0, grad_w_1, grad_w_2, ..., grad_w_n)
-        grad = np.zeros(self.dimension)
+        grad = np.zeros(self.dimension + 1)
         
-        n_points = len(train_set)
-        
-        # para cada ponto, somar parcela do gradiente
-        for point in train_set:
-                x, y = point[:-1], point[-1]
-                y_hat = self.output(x)
-                
-                logit_grad = self.logit_gradient(x)
-                
-                grad = grad + (2/n_points)*(y_hat - y)*logit_grad
+        for i in range(0, self.dimension + 1):
+            grad[i] = self.loss_partial_derivative(train_set, i)
         
         return grad
+    
+    
+    def loss_partial_derivative(self, train_set: np.array, weigth_index: int) -> float:
+        """Derivada parcial da Loss del L/del w_k, em relação ao peso w_k
+
+        Args:
+            train_set (np.array): dataset de treino
+            weigth_index (int): índice k do peso w_k, em relação ao qual se deseja calcular
+            del L/del w_k
+
+        Returns:
+            float: derivada parcial da loss em relação a del L/del w_k
+        """
+        n_points = len(train_set)
+        
+        loss_par_der = 0
+        
+        for point in train_set:
+            x, y = point[:-1], point[-1]
+            y_hat = self.output(x)    
+            w_k = x[weigth_index - 1] if weigth_index != 0 else 1
+            
+            loss_par_der = loss_par_der + ((y_hat - y)*y_hat*(1 - y_hat)*w_k/n_points)
+            
+        return loss_par_der
     
     
     def weighted_sum(self, x: np.array):
@@ -94,26 +111,3 @@ class Perceptron:
         """
         # logit(x) = 1/(1 + e^{-x})
         return 1/(1 + np.exp(-x))
-    
-    
-    def logit_gradient(self, x:np.array) -> np.array:
-        """Gradiente da função logística
-        grad logit(x) = (grad_bias, grad_w_1, grad_w_2, ..., grad_w_n)
-
-        Args:
-            x (np.array): vetor no qual se deseja calcular o gradiente
-
-        Returns:
-            np.array: gradiente do vetor de pesos grad logit(x)
-        """
-        w_sum = self.weighted_sum(x)
-        logit_x = self.logit(w_sum)
-        logit_derivative = logit_x * (1 - logit_x)
-        
-        # grad_w_k = \sigma(x) * (1 - \sigma(x)) * w_k
-        grad_weights = logit_derivative*self.weights
-        
-        # grad_w_k = \sigma(x) * (1 - \sigma(x))
-        grad_bias = np.array([logit_derivative])
-        
-        return np.concatenate([grad_bias, grad_weights])
