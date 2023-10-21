@@ -2,18 +2,18 @@ import numpy as np
 
 class Perceptron:
     def __init__(self, dimension) -> None:
-        self.weights = np.zeros(dimension)
-        self.bias = 0
+        self.weights = np.zeros(dimension + 1)
         self.dimension = dimension 
         
     def output(self, x: np.array):
-        """Saída do perceptron
+        """Saída y do perceptron, para um dado x = (x_1, x_2, x_3, ..., x_n)
 
         Args:
-            x (np.array): vetor de entrada
+            x (np.array): vetor de entrada x = (x_1, x_2, x_3, ..., x_n)
 
         Returns:
-            float: valor da saída y = f(x), sendo f a função de ativação
+            float: valor da saída y = f(w_sum(x)), sendo f a função de ativação e w_sum(x) =
+            <w,x> = w^Tx = w_0 + w_1*x_1 + w_*2x_2 + w_3*x_3 + ... + w_n*x_n
         """
         w_sum = self.weighted_sum(x)
         
@@ -67,17 +67,19 @@ class Perceptron:
         
         return grad
     
+    
     def weighted_sum(self, x: np.array):
         """Soma da entrada, ponderada pelos pesos do perceptron
-        S(x) = w_0 + w^Tx = w_0 + w_1*x_1 + w_2*x_2 + ... + w_n*x_n
+        S(x) = <w,x> = w_0 + w^Tx = w_0 + w_1*x_1 + w_2*x_2 + ... + w_n*x_n,
+        para x = (1, x_1, x_2, ..., x_n) e w = (w_0, w_1, w_2, ..., w_n)
         Args:
             x (np.array): vetor de entrada
 
         Returns:
             float: valor da soma ponderada pelos pesos
         """
-        # w_sum = w_0 + w^Tx = w_0 + w_1*x_1 + w_2*x_2 + ... + w_n*x_n
-        return self.bias + np.dot(self.weights, x)
+        # w_sum = <w,x> = w^Tx = w_0 + w_1*x_1 + w_2*x_2 + ... + w_n*x_n
+        return self.weights[0] + np.dot(self.weights[1:], x)
     
     
     def logit(self, x: float) -> float:
