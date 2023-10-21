@@ -115,36 +115,3 @@ class Perceptron:
         grad_bias = np.array([logit_derivative])
         
         return np.concatenate([grad_bias, grad_weights])
-
-
-def generate_data(n):
-    for i in range(n):
-        x = 10*(np.random.rand() - 0.5)
-        print(f'[{x}, {Perceptron.logit(Perceptron, x)}], ')
-    
-def test():
-    p = Perceptron(1)
-    p.weights = np.array([2.5])
-    p.bias = -1.3
-    
-    # f(x) = logit(0 + 1x)
-    train_set = np.array([
-        [3.0345, 0.954], 
-        [2.8760, 0.94], 
-        [-2.666, 0.064], 
-        [1.840, 0.862], 
-        [-3.018, 0.0465], 
-        [-3.844, 0.0209], 
-        [-2.26, 0.0940], 
-        [2.986, 0.951], 
-        [2.482, 0.922], 
-        [3.0026, 0.952]
-    ])
-    
-    p.gradient_descent_fit(train_set, 0.10, 400)
-    
-    x = np.array([5])
-    print(p.output(x))
-
-# generate_data(10)
-test()
