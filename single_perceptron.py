@@ -1,10 +1,13 @@
 import numpy as np
 
 class Perceptron:
-    def __init__(self, dimension) -> None:
+    def __init__(self, dimension, activation_function_type: str = 'logit') -> None:
         self.weights = np.zeros(dimension + 1)
-        self.dimension = dimension 
-        
+        self.dimension = dimension
+        self.activation_function_type = activation_function_type
+        self.activation_function_dict = {
+            'logit': self.logit
+        }
         
     def output(self, x: np.array):
         """Saída y do perceptron, para um dado x = (x_1, x_2, x_3, ..., x_n)
@@ -18,7 +21,20 @@ class Perceptron:
         """
         w_sum = self.weighted_sum(x)
         
-        return self.logit(w_sum)
+        return self.activation_function(w_sum)
+    
+    
+    def activation_function(self, x: np.array) -> float:
+        """Função de ativação f
+
+        Args:
+            x (np.array): vetor de entrada x = (x_1, x_2, x_3, ..., x_n)
+
+        Returns:
+            float: resultado de f(x) 
+        """
+        
+        return self.activation_function_dict[self.activation_function_type](x)
     
     
     def gradient_descent_fit(self, train_set: np.array, learning_rate: float, epochs: int) -> None:
@@ -29,8 +45,6 @@ class Perceptron:
             learning_rate (float): taxa de aprendizado
             epochs (int): quantidade de épocas
         """
-        # pontos do dataset de treino
-        n_points = len(train_set)
         
         for i in range(epochs):
             loss_grad = self.loss_grad(train_set)
