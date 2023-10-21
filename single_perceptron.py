@@ -6,7 +6,10 @@ class Perceptron:
         self.dimension = dimension
         self.activation_function_type = activation_function_type
         self.activation_function_dict = {
-            'logit': self.logit
+            'logit': self.logit,
+            'relu': self.ReLU,
+            'tanh': self.hiperbolic_tan,
+            'linear': self.linear_identity
         }
         
     def output(self, x: np.array):
@@ -121,7 +124,46 @@ class Perceptron:
             x (float): entrada
 
         Returns:
-            float: saída da função logística y = f(x)
+            float: saída da função logística f(x) = \sigma(x) = 1/(1 + e^{-x})
         """
-        # logit(x) = 1/(1 + e^{-x})
+        
         return 1/(1 + np.exp(-x))
+    
+    
+    def hiperbolic_tan(self, x: float) -> float:
+        """Função tangente hiperbólica
+        f(x) = (e^x - e^{-x})/(e^x + e^{-x})
+
+        Args:
+            x (float): entrada x
+
+        Returns:
+            float: saída da função tangente hiperbólica f(x) = tanh(x) = 
+            (e^x - e^{-x})/(e^x + e^{-x})
+        """
+        
+        return np.tanh(x)
+    
+    
+    def ReLU(self, x: float) -> float:
+        """Função ReLU (Rectified Linear Unit) f(x) = max(0, x)
+
+        Args:
+            x (float): entrada x
+
+        Returns:
+            float: saída da função ReLU f(x) = max(0, x)
+        """
+        return x if x > 0 else 0
+    
+    
+    def linear_identity(self, x: float) -> float:
+        """Função identidade I(x) = x
+
+        Args:
+            x (float): entrada x
+
+        Returns:
+            float: saída da função identidade I(x) = x
+        """
+        return x
