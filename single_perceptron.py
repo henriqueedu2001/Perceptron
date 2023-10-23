@@ -12,6 +12,7 @@ class Perceptron:
             'linear': self.linear_identity
         }
         
+        
     def output(self, x: np.array):
         """Saída y do perceptron, para um dado x = (x_1, x_2, x_3, ..., x_n)
 
@@ -68,6 +69,7 @@ class Perceptron:
             np.array: gradiente da loss grad L = (grad_w_0, grad_w_1, 
             grad_w_2, grad_w_3, ..., grad_w_n)
         """
+        
         # grad L = (grad_w_0, grad_w_1, grad_w_2, ..., grad_w_n)
         grad = np.zeros(self.dimension + 1)
         
@@ -112,6 +114,7 @@ class Perceptron:
         Returns:
             float: valor da soma ponderada pelos pesos
         """
+        
         # w_sum = <w,x> = w^Tx = w_0 + w_1*x_1 + w_2*x_2 + ... + w_n*x_n
         return self.weights[0] + np.dot(self.weights[1:], x)
     
@@ -154,7 +157,23 @@ class Perceptron:
         Returns:
             float: saída da função ReLU f(x) = max(0, x)
         """
+        
         return x if x > 0 else 0
+    
+    
+    def step(self, x: float) -> float:
+        """Função degrau, de Heaviside H(x) = 1, se x >= 0, e H(x) = 
+        0, se x < 0
+
+        Args:
+            x (float): entrada x
+
+        Returns:
+            float: saída da função degrau de Heaviside H(x); H(x) = 1, 
+            se x >= 0, e H(x) = 0, se x < 0
+        """
+        
+        return 1 if x >= 0 else 0
     
     
     def linear_identity(self, x: float) -> float:
@@ -166,4 +185,5 @@ class Perceptron:
         Returns:
             float: saída da função identidade I(x) = x
         """
+        
         return x
